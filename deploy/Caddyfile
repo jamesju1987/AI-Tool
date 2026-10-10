@@ -1,0 +1,21 @@
+# Automatic HTTPS (Let's Encrypt). Point the domain's A/AAAA records at the server first.
+{$DOMAIN} {
+	encode zstd gzip
+
+	# Downloaded logos/previews and Next.js assets are immutable — let browsers and CDNs keep them.
+	@static path /_next/static/* /media/*
+	header @static Cache-Control "public, max-age=31536000, immutable"
+
+	# Public pages: short shared cache so a CDN in front can absorb traffic spikes.
+	@public {
+		method GET
+		not path /admin* /api/* /go/* /search* /zh/search*
+	}
+	header @public Cache-Control "public, s-maxage=120, stale-while-revalidate=600"
+
+	reverse_proxy web:3000
+}
+
+www.{$DOMAIN} {
+	redir https://{$DOMAIN}{uri} permanent
+}

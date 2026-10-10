@@ -1,0 +1,340 @@
+/**
+ * Starter tools so the site is not empty on first run. These are hand-written examples:
+ * have an editor verify pricing and access before launch — the patrol job re-checks them.
+ */
+export type SeedTool = {
+  slug: string;
+  name: string;
+  url: string;
+  globalUrl?: string;
+  cat: string; // primary (sub)category slug
+  origin: string;
+  pricing: "free" | "freemium" | "paid" | "unknown";
+  cn: "direct" | "unstable" | "blocked" | "unknown";
+  platforms: string[];
+  openSource?: boolean;
+  cnUi?: boolean;
+  enterprise?: boolean;
+  company: string;
+  tagZh: string;
+  tagEn: string;
+  descZh: string;
+  descEn: string;
+  featZh: string[];
+  featEn: string[];
+};
+
+export const seedTools: SeedTool[] = [
+  {
+    slug: "chatgpt", name: "ChatGPT", url: "https://chatgpt.com", cat: "chat-general", origin: "US",
+    pricing: "freemium", cn: "blocked", platforms: ["web", "desktop", "mobile"], cnUi: true, enterprise: true, company: "OpenAI",
+    tagZh: "OpenAI 推出的通用 AI 助手", tagEn: "OpenAI's general-purpose AI assistant",
+    descZh: "支持对话、写作、编程、读文件、联网搜索和图片生成的通用助手，提供免费版和付费订阅。",
+    descEn: "A general assistant for chat, writing, coding, file analysis, web search and image generation, with free and paid plans.",
+    featZh: ["多轮对话与长文写作", "上传文件分析", "图片生成与识图"], featEn: ["Conversation and long-form writing", "File upload and analysis", "Image generation and vision"],
+  },
+  {
+    slug: "claude", name: "Claude", url: "https://claude.ai", cat: "chat-general", origin: "US",
+    pricing: "freemium", cn: "blocked", platforms: ["web", "desktop", "mobile"], cnUi: true, enterprise: true, company: "Anthropic",
+    tagZh: "Anthropic 推出的 AI 助手，擅长写作与编程", tagEn: "Anthropic's AI assistant for writing, analysis and code",
+    descZh: "擅长长文档阅读、写作与代码，可连接常用工具完成多步任务。",
+    descEn: "Strong at long documents, writing and code, and can connect to common tools to complete multi-step work.",
+    featZh: ["长文档阅读与总结", "编程与代码审查", "连接外部应用"], featEn: ["Long document reading and summaries", "Coding and code review", "Connects to external apps"],
+  },
+  {
+    slug: "gemini", name: "Gemini", url: "https://gemini.google.com", cat: "chat-general", origin: "US",
+    pricing: "freemium", cn: "blocked", platforms: ["web", "mobile"], cnUi: true, enterprise: true, company: "Google",
+    tagZh: "谷歌的 AI 助手，与 Google 应用深度整合", tagEn: "Google's AI assistant, integrated with Google apps",
+    descZh: "谷歌推出的多模态 AI 助手，可与 Gmail、文档、云端硬盘等 Google 服务配合使用。",
+    descEn: "Google's multimodal assistant that works alongside Gmail, Docs, Drive and other Google services.",
+    featZh: ["多模态对话", "整合 Google 应用", "深度研究报告"], featEn: ["Multimodal chat", "Works with Google apps", "Deep research reports"],
+  },
+  {
+    slug: "deepseek", name: "DeepSeek", url: "https://chat.deepseek.com", cat: "chat-general", origin: "CN",
+    pricing: "free", cn: "direct", platforms: ["web", "mobile", "api"], openSource: true, cnUi: true, company: "深度求索",
+    tagZh: "深度求索推出的免费 AI 对话助手与开源模型", tagEn: "Free AI assistant and open-weight models from DeepSeek",
+    descZh: "国内可直接使用的 AI 助手，模型权重开源，同时提供低价 API。",
+    descEn: "An AI assistant from a Hangzhou-based lab, with open-weight models and a low-cost API.",
+    featZh: ["深度思考推理", "联网搜索", "开放 API"], featEn: ["Reasoning mode", "Web search", "Low-cost API"],
+  },
+  {
+    slug: "kimi", name: "Kimi", url: "https://www.kimi.com", cat: "chat-general", origin: "CN",
+    pricing: "freemium", cn: "direct", platforms: ["web", "desktop", "mobile"], cnUi: true, company: "月之暗面",
+    tagZh: "月之暗面推出的 AI 助手，擅长长文本", tagEn: "Moonshot AI's assistant known for long-context reading",
+    descZh: "支持超长文档阅读、联网搜索和多文件分析的 AI 助手。",
+    descEn: "An assistant for very long documents, web search and multi-file analysis.",
+    featZh: ["长文档与多文件阅读", "联网搜索", "PPT 生成"], featEn: ["Long and multi-file reading", "Web search", "Slide generation"],
+  },
+  {
+    slug: "doubao", name: "豆包", url: "https://www.doubao.com", cat: "chat-general", origin: "CN",
+    pricing: "free", cn: "direct", platforms: ["web", "desktop", "mobile"], cnUi: true, company: "字节跳动",
+    tagZh: "字节跳动推出的 AI 助手", tagEn: "ByteDance's AI assistant for Chinese users",
+    descZh: "面向大众的 AI 助手，覆盖对话、写作、翻译、图片生成和语音通话。",
+    descEn: "A consumer AI assistant covering chat, writing, translation, image generation and voice calls.",
+    featZh: ["语音对话", "AI 写作", "图片生成"], featEn: ["Voice chat", "Writing help", "Image generation"],
+  },
+  {
+    slug: "yuanbao", name: "腾讯元宝", url: "https://yuanbao.tencent.com", cat: "chat-general", origin: "CN",
+    pricing: "free", cn: "direct", platforms: ["web", "desktop", "mobile"], cnUi: true, company: "腾讯",
+    tagZh: "腾讯推出的免费 AI 助手", tagEn: "Tencent's free AI assistant",
+    descZh: "腾讯推出的 AI 助手，可搜索公众号等腾讯生态内容。",
+    descEn: "Tencent's assistant that can search content across the Tencent ecosystem, including WeChat articles.",
+    featZh: ["公众号内容搜索", "文档解读", "多模型可选"], featEn: ["WeChat article search", "Document reading", "Multiple models"],
+  },
+  {
+    slug: "perplexity", name: "Perplexity", url: "https://www.perplexity.ai", cat: "search-general", origin: "US",
+    pricing: "freemium", cn: "unstable", platforms: ["web", "desktop", "mobile"], enterprise: true, company: "Perplexity AI",
+    tagZh: "带来源引用的 AI 搜索引擎", tagEn: "AI answer engine with cited sources",
+    descZh: "用自然语言提问，直接得到带来源链接的答案。",
+    descEn: "Ask in plain language and get answers with links to the sources.",
+    featZh: ["答案附来源", "追问", "专业搜索模式"], featEn: ["Cited answers", "Follow-up questions", "Pro search"],
+  },
+  {
+    slug: "metaso", name: "秘塔 AI 搜索", url: "https://metaso.cn", cat: "search-general", origin: "CN",
+    pricing: "free", cn: "direct", platforms: ["web", "mobile"], cnUi: true, company: "秘塔科技",
+    tagZh: "无广告、带引用的中文 AI 搜索", tagEn: "Ad-free Chinese AI search with citations",
+    descZh: "秘塔科技推出的 AI 搜索引擎，可生成带来源的结构化答案和脑图。",
+    descEn: "An AI search engine that returns structured, cited answers and mind maps, focused on Chinese sources.",
+    featZh: ["答案附来源", "学术搜索", "结果生成脑图"], featEn: ["Cited answers", "Academic search", "Mind-map output"],
+  },
+  {
+    slug: "sudowrite", name: "Sudowrite", url: "https://www.sudowrite.com", cat: "writing-fiction", origin: "US",
+    pricing: "paid", cn: "unknown", platforms: ["web"], company: "Sudowrite",
+    tagZh: "为小说作者设计的 AI 写作助手", tagEn: "AI writing partner for fiction authors",
+    descZh: "帮助小说作者构思情节、扩写场景和改写文字。",
+    descEn: "Helps novelists brainstorm plots, expand scenes and rewrite prose.",
+    featZh: ["情节构思", "场景扩写", "风格改写"], featEn: ["Plot brainstorming", "Scene expansion", "Style rewrites"],
+  },
+  {
+    slug: "midjourney", name: "Midjourney", url: "https://www.midjourney.com", cat: "image-generation", origin: "US",
+    pricing: "paid", cn: "unknown", platforms: ["web"], company: "Midjourney",
+    tagZh: "以审美见长的 AI 绘图工具", tagEn: "AI image generator known for its aesthetics",
+    descZh: "通过文字描述生成高质量图像，需付费订阅使用。",
+    descEn: "Generates high-quality images from text prompts; requires a paid subscription.",
+    featZh: ["文生图", "图片变体与扩图", "风格参考"], featEn: ["Text to image", "Variations and outpainting", "Style references"],
+  },
+  {
+    slug: "jimeng", name: "即梦 AI", url: "https://jimeng.jianying.com", cat: "image-generation", origin: "CN",
+    pricing: "freemium", cn: "direct", platforms: ["web", "mobile"], cnUi: true, company: "字节跳动",
+    tagZh: "字节跳动旗下的 AI 图片与视频创作平台", tagEn: "ByteDance's AI image and video creation platform",
+    descZh: "支持文生图、图生视频和智能画布，可直接生成中文文字。",
+    descEn: "Text-to-image, image-to-video and an editing canvas, with support for rendering Chinese text.",
+    featZh: ["文生图", "图生视频", "智能画布"], featEn: ["Text to image", "Image to video", "Editing canvas"],
+  },
+  {
+    slug: "liblib", name: "LiblibAI 哩布哩布", url: "https://www.liblib.art", cat: "image-generation", origin: "CN",
+    pricing: "freemium", cn: "direct", platforms: ["web"], cnUi: true, company: "LiblibAI",
+    tagZh: "AI 绘图平台与模型分享社区", tagEn: "AI image platform and model-sharing community",
+    descZh: "提供在线生图和大量社区模型，适合需要特定风格的创作者。",
+    descEn: "Online image generation with a large library of community models for specific styles.",
+    featZh: ["在线生图", "社区模型库", "模型训练"], featEn: ["Online generation", "Community models", "Model training"],
+  },
+  {
+    slug: "ideogram", name: "Ideogram", url: "https://ideogram.ai", cat: "image-generation", origin: "CA",
+    pricing: "freemium", cn: "unknown", platforms: ["web"], company: "Ideogram",
+    tagZh: "擅长在图片中生成文字的 AI 绘图工具", tagEn: "Image generator that renders text accurately",
+    descZh: "适合做海报和 Logo，能在图片中准确生成英文文字。",
+    descEn: "Good for posters and logos thanks to accurate in-image typography.",
+    featZh: ["图中文字生成", "海报与 Logo", "风格预设"], featEn: ["Text in images", "Posters and logos", "Style presets"],
+  },
+  {
+    slug: "remove-bg", name: "remove.bg", url: "https://www.remove.bg", cat: "image-background", origin: "AT",
+    pricing: "freemium", cn: "unknown", platforms: ["web", "api"], cnUi: true, company: "Kaleido AI (Canva)",
+    tagZh: "一键自动抠图", tagEn: "Remove image backgrounds in one click",
+    descZh: "上传图片几秒内自动去除背景，提供 API 批量处理。",
+    descEn: "Upload an image and get the background removed in seconds; an API handles batches.",
+    featZh: ["自动抠图", "更换背景", "API 批量处理"], featEn: ["Automatic cut-outs", "Replace backgrounds", "Batch API"],
+  },
+  {
+    slug: "runway", name: "Runway", url: "https://runwayml.com", cat: "video-generation", origin: "US",
+    pricing: "freemium", cn: "unknown", platforms: ["web", "mobile"], enterprise: true, company: "Runway",
+    tagZh: "AI 视频生成与编辑平台", tagEn: "AI video generation and editing suite",
+    descZh: "提供文生视频、图生视频和多种 AI 视频编辑工具。",
+    descEn: "Text-to-video, image-to-video and a set of AI video editing tools.",
+    featZh: ["文生视频", "图生视频", "视频编辑"], featEn: ["Text to video", "Image to video", "Video editing"],
+  },
+  {
+    slug: "kling", name: "可灵 AI", url: "https://app.klingai.com", globalUrl: "https://app.klingai.com/global", cat: "video-generation", origin: "CN",
+    pricing: "freemium", cn: "direct", platforms: ["web", "mobile"], cnUi: true, company: "快手",
+    tagZh: "快手推出的 AI 视频生成工具", tagEn: "Kuaishou's AI video generator",
+    descZh: "支持文生视频和图生视频，有面向海外用户的国际版。",
+    descEn: "Text-to-video and image-to-video from Kuaishou, with an international edition.",
+    featZh: ["文生视频", "图生视频", "对口型"], featEn: ["Text to video", "Image to video", "Lip sync"],
+  },
+  {
+    slug: "hailuo", name: "海螺 AI", url: "https://hailuoai.com", cat: "video-generation", origin: "CN",
+    pricing: "freemium", cn: "direct", platforms: ["web", "mobile"], cnUi: true, company: "MiniMax",
+    tagZh: "MiniMax 推出的 AI 视频与语音创作工具", tagEn: "MiniMax's AI video and voice creation tool",
+    descZh: "MiniMax 推出的多模态创作工具，以视频生成为主。",
+    descEn: "A multimodal creation tool from MiniMax, best known for video generation.",
+    featZh: ["文生视频", "图生视频", "语音生成"], featEn: ["Text to video", "Image to video", "Voice generation"],
+  },
+  {
+    slug: "heygen", name: "HeyGen", url: "https://www.heygen.com", cat: "video-avatar", origin: "US",
+    pricing: "freemium", cn: "unknown", platforms: ["web", "api"], enterprise: true, company: "HeyGen",
+    tagZh: "AI 数字人视频与视频翻译", tagEn: "AI avatar videos and video translation",
+    descZh: "用数字人生成讲解视频，并可把视频翻译成多种语言并对口型。",
+    descEn: "Create presenter videos with AI avatars and translate videos with lip sync.",
+    featZh: ["数字人视频", "视频翻译", "声音克隆"], featEn: ["Avatar videos", "Video translation", "Voice cloning"],
+  },
+  {
+    slug: "elevenlabs", name: "ElevenLabs", url: "https://elevenlabs.io", cat: "audio-tts", origin: "US",
+    pricing: "freemium", cn: "unknown", platforms: ["web", "api"], enterprise: true, company: "ElevenLabs",
+    tagZh: "逼真的 AI 配音与声音克隆", tagEn: "Realistic AI voices and voice cloning",
+    descZh: "提供多语种文本转语音、声音克隆和配音翻译。",
+    descEn: "Multilingual text to speech, voice cloning and dubbing.",
+    featZh: ["文本转语音", "声音克隆", "视频配音"], featEn: ["Text to speech", "Voice cloning", "Dubbing"],
+  },
+  {
+    slug: "suno", name: "Suno", url: "https://suno.com", cat: "audio-music", origin: "US",
+    pricing: "freemium", cn: "unknown", platforms: ["web", "mobile"], company: "Suno",
+    tagZh: "输入描述即可生成完整歌曲", tagEn: "Generate full songs from a text prompt",
+    descZh: "根据文字描述或歌词生成带人声的完整歌曲。",
+    descEn: "Creates complete songs with vocals from a description or your own lyrics.",
+    featZh: ["文字生成歌曲", "自定义歌词", "多种曲风"], featEn: ["Prompt to song", "Custom lyrics", "Many genres"],
+  },
+  {
+    slug: "gamma", name: "Gamma", url: "https://gamma.app", cat: "office-slides", origin: "US",
+    pricing: "freemium", cn: "unknown", platforms: ["web"], cnUi: true, company: "Gamma",
+    tagZh: "输入主题自动生成演示文稿和网页", tagEn: "Generate presentations and web pages from a prompt",
+    descZh: "根据主题或文档自动生成排版好的 PPT、文档和网页。",
+    descEn: "Turns a topic or document into designed slides, documents or web pages.",
+    featZh: ["一键生成 PPT", "导出 PPTX/PDF", "网页发布"], featEn: ["Prompt to slides", "Export to PPTX/PDF", "Publish as web page"],
+  },
+  {
+    slug: "aippt", name: "AiPPT", url: "https://www.aippt.cn", cat: "office-slides", origin: "CN",
+    pricing: "freemium", cn: "direct", platforms: ["web"], cnUi: true, company: "AiPPT",
+    tagZh: "国内常用的 AI 一键生成 PPT 工具", tagEn: "Chinese AI slide generator",
+    descZh: "输入主题或上传文档，自动生成大纲和成套 PPT。",
+    descEn: "Enter a topic or upload a document to generate an outline and a full slide deck.",
+    featZh: ["主题生成大纲", "文档转 PPT", "海量模板"], featEn: ["Outline from a topic", "Document to slides", "Large template library"],
+  },
+  {
+    slug: "manus", name: "Manus", url: "https://manus.im", cat: "agents-general", origin: "SG",
+    pricing: "freemium", cn: "unknown", platforms: ["web", "mobile"], company: "Manus",
+    tagZh: "可自主完成多步任务的通用 AI 智能体", tagEn: "General AI agent that completes multi-step tasks",
+    descZh: "给出目标后，智能体会自行搜索、写代码、生成文件来完成任务。",
+    descEn: "Give it a goal and it searches, writes code and produces files to get the task done.",
+    featZh: ["自主规划任务", "生成报告与网页", "云端运行"], featEn: ["Plans tasks on its own", "Produces reports and sites", "Runs in the cloud"],
+  },
+  {
+    slug: "coze", name: "扣子 Coze", url: "https://www.coze.cn", globalUrl: "https://www.coze.com", cat: "agents-builder", origin: "CN",
+    pricing: "freemium", cn: "direct", platforms: ["web", "api"], cnUi: true, enterprise: true, company: "字节跳动",
+    tagZh: "零代码搭建 AI 智能体和工作流", tagEn: "No-code platform for building AI agents and workflows",
+    descZh: "通过可视化方式搭建智能体、工作流和知识库，并发布到多个渠道。",
+    descEn: "Build agents, workflows and knowledge bases visually and publish them to multiple channels.",
+    featZh: ["可视化工作流", "插件与知识库", "多渠道发布"], featEn: ["Visual workflows", "Plugins and knowledge bases", "Multi-channel publishing"],
+  },
+  {
+    slug: "cursor", name: "Cursor", url: "https://cursor.com", cat: "coding-ide", origin: "US",
+    pricing: "freemium", cn: "unstable", platforms: ["desktop"], enterprise: true, company: "Anysphere",
+    tagZh: "以 AI 为核心的代码编辑器", tagEn: "AI-first code editor",
+    descZh: "基于 VS Code 的 AI 编辑器，支持代码补全、对话改代码和智能体模式。",
+    descEn: "A VS Code-based editor with AI completion, chat-driven edits and an agent mode.",
+    featZh: ["智能补全", "对话式改代码", "智能体模式"], featEn: ["Smart completion", "Chat-driven edits", "Agent mode"],
+  },
+  {
+    slug: "github-copilot", name: "GitHub Copilot", url: "https://github.com/features/copilot", cat: "coding-assistant", origin: "US",
+    pricing: "freemium", cn: "direct", platforms: ["desktop", "plugin", "web"], enterprise: true, company: "GitHub (Microsoft)",
+    tagZh: "GitHub 推出的 AI 编程助手", tagEn: "GitHub's AI pair programmer",
+    descZh: "在主流 IDE 中提供代码补全、对话和代码审查。",
+    descEn: "Code completion, chat and code review inside popular IDEs.",
+    featZh: ["代码补全", "IDE 内对话", "PR 代码审查"], featEn: ["Code completion", "Chat in the IDE", "Pull request reviews"],
+  },
+  {
+    slug: "trae", name: "TRAE", url: "https://www.trae.cn", globalUrl: "https://www.trae.ai", cat: "coding-ide", origin: "CN",
+    pricing: "freemium", cn: "direct", platforms: ["desktop"], cnUi: true, company: "字节跳动",
+    tagZh: "字节跳动推出的 AI 原生 IDE", tagEn: "ByteDance's AI-native IDE",
+    descZh: "内置 AI 对话与智能体的代码编辑器，有国内版和国际版。",
+    descEn: "A code editor with built-in AI chat and agents, available in Chinese and international editions.",
+    featZh: ["AI 对话编程", "智能体模式", "中文界面"], featEn: ["Chat-based coding", "Agent mode", "Chinese UI"],
+  },
+  {
+    slug: "lovable", name: "Lovable", url: "https://lovable.dev", cat: "coding-appgen", origin: "SE",
+    pricing: "freemium", cn: "unknown", platforms: ["web"], company: "Lovable",
+    tagZh: "用对话生成并部署全栈应用", tagEn: "Build and deploy full-stack apps by chatting",
+    descZh: "描述想要的应用，自动生成前后端代码并一键上线。",
+    descEn: "Describe the app you want; it writes the front end and back end and deploys it.",
+    featZh: ["对话生成应用", "一键部署", "导出代码"], featEn: ["Chat to app", "One-click deploy", "Code export"],
+  },
+  {
+    slug: "recraft", name: "Recraft", url: "https://www.recraft.ai", cat: "design-graphic", origin: "US",
+    pricing: "freemium", cn: "unknown", platforms: ["web"], company: "Recraft",
+    tagZh: "面向设计师的 AI 矢量图与插画生成", tagEn: "AI vector and illustration generator for designers",
+    descZh: "生成可编辑的矢量图、图标和插画，并保持统一风格。",
+    descEn: "Generates editable vectors, icons and illustrations in a consistent style.",
+    featZh: ["矢量图生成", "图标套组", "品牌风格一致"], featEn: ["Vector generation", "Icon sets", "Consistent brand style"],
+  },
+  {
+    slug: "deepl", name: "DeepL", url: "https://www.deepl.com", cat: "translation-docs", origin: "DE",
+    pricing: "freemium", cn: "direct", platforms: ["web", "desktop", "mobile", "api"], cnUi: true, enterprise: true, company: "DeepL",
+    tagZh: "译文自然的 AI 翻译工具", tagEn: "AI translator known for natural-sounding output",
+    descZh: "支持文本和整份文档翻译，保留原文格式。",
+    descEn: "Translates text and whole documents while keeping the original formatting.",
+    featZh: ["文档翻译保留格式", "术语表", "写作润色"], featEn: ["Format-preserving document translation", "Glossaries", "Writing assistant"],
+  },
+  {
+    slug: "immersive-translate", name: "沉浸式翻译", url: "https://immersivetranslate.com", cat: "translation-web", origin: "CN",
+    pricing: "freemium", cn: "direct", platforms: ["plugin", "mobile", "desktop"], cnUi: true, company: "Immersive Translate",
+    tagZh: "网页双语对照翻译插件", tagEn: "Side-by-side bilingual web page translation",
+    descZh: "浏览器插件，网页、PDF 和视频字幕双语对照显示。",
+    descEn: "A browser extension that shows web pages, PDFs and video subtitles in both languages.",
+    featZh: ["网页双语对照", "PDF 翻译", "视频双语字幕"], featEn: ["Bilingual web pages", "PDF translation", "Bilingual subtitles"],
+  },
+  {
+    slug: "gptzero", name: "GPTZero", url: "https://gptzero.me", cat: "detection", origin: "US",
+    pricing: "freemium", cn: "unknown", platforms: ["web", "plugin", "api"], company: "GPTZero",
+    tagZh: "检测文本是否由 AI 生成", tagEn: "Detect whether text was written by AI",
+    descZh: "面向教育场景的 AI 文本检测工具，给出 AI 生成的可能性。",
+    descEn: "An AI-text detector built for education that estimates how likely text is AI-generated.",
+    featZh: ["AI 文本检测", "逐句标注", "批量检测"], featEn: ["AI text detection", "Sentence highlighting", "Batch checks"],
+  },
+  {
+    slug: "openrouter", name: "OpenRouter", url: "https://openrouter.ai", cat: "platforms-api", origin: "US",
+    pricing: "paid", cn: "unknown", platforms: ["api", "web"], company: "OpenRouter",
+    tagZh: "一个 API 调用数百个大模型", tagEn: "One API for hundreds of models",
+    descZh: "统一的模型 API 网关，按量计费，可在不同厂商模型间切换。",
+    descEn: "A unified model API with pay-as-you-go billing and easy switching between providers.",
+    featZh: ["统一 API", "按量付费", "模型路由与回退"], featEn: ["Unified API", "Pay as you go", "Routing and fallbacks"],
+  },
+  {
+    slug: "hugging-face", name: "Hugging Face", url: "https://huggingface.co", cat: "platforms-open-models", origin: "US",
+    pricing: "freemium", cn: "blocked", platforms: ["web", "api"], openSource: true, enterprise: true, company: "Hugging Face",
+    tagZh: "开源模型、数据集与 AI 应用社区", tagEn: "Hub for open models, datasets and AI apps",
+    descZh: "托管海量开源模型和数据集，并可在线运行 AI 演示应用。",
+    descEn: "Hosts open models and datasets and lets you run AI demos online.",
+    featZh: ["开源模型库", "数据集", "Spaces 在线演示"], featEn: ["Model hub", "Datasets", "Spaces demos"],
+  },
+  {
+    slug: "ollama", name: "Ollama", url: "https://ollama.com", cat: "platforms-open-models", origin: "US",
+    pricing: "free", cn: "direct", platforms: ["desktop"], openSource: true, company: "Ollama",
+    tagZh: "在本机一键运行开源大模型", tagEn: "Run open models on your own machine",
+    descZh: "开源工具，一条命令即可在电脑本地下载和运行大模型。",
+    descEn: "An open-source tool that downloads and runs language models locally with one command.",
+    featZh: ["本地运行模型", "兼容 OpenAI API", "离线可用"], featEn: ["Run models locally", "OpenAI-compatible API", "Works offline"],
+  },
+  {
+    slug: "prompts-chat", name: "prompts.chat", url: "https://prompts.chat", cat: "prompts", origin: "US",
+    pricing: "free", cn: "unknown", platforms: ["web"], openSource: true, company: "Community",
+    tagZh: "开源的提示词合集", tagEn: "Open-source collection of prompts",
+    descZh: "社区维护的提示词库，可直接复制使用。",
+    descEn: "A community-maintained prompt library you can copy from.",
+    featZh: ["提示词库", "按角色分类", "开源可贡献"], featEn: ["Prompt library", "Organised by role", "Open to contributions"],
+  },
+  {
+    slug: "deeplearning-ai", name: "DeepLearning.AI", url: "https://www.deeplearning.ai", cat: "learning", origin: "US",
+    pricing: "freemium", cn: "unknown", platforms: ["web"], company: "DeepLearning.AI",
+    tagZh: "吴恩达创办的 AI 课程平台", tagEn: "AI courses founded by Andrew Ng",
+    descZh: "提供机器学习、深度学习和生成式 AI 的入门与进阶课程，其中大量短课免费。",
+    descEn: "Beginner to advanced courses on machine learning, deep learning and generative AI, many short courses free.",
+    featZh: ["系统课程", "免费短课", "动手实验"], featEn: ["Structured courses", "Free short courses", "Hands-on labs"],
+  },
+  {
+    slug: "dia", name: "Dia", url: "https://www.diabrowser.com", cat: "browser", origin: "US",
+    pricing: "freemium", cn: "unknown", platforms: ["desktop"], company: "The Browser Company",
+    tagZh: "内置 AI 助手的浏览器", tagEn: "A browser with an AI assistant built in",
+    descZh: "可以就当前打开的网页提问、总结和改写的浏览器。",
+    descEn: "A browser where you can ask about, summarise and rewrite the pages you have open.",
+    featZh: ["与网页对话", "多标签页总结", "写作辅助"], featEn: ["Chat with pages", "Summarise across tabs", "Writing help"],
+  },
+];

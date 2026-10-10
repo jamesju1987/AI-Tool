@@ -1,26 +1,87 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* Self-hosted fonts (Google Fonts is unreachable from mainland China). */
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/instrument-sans";
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --canvas: #eef1f5;
+  --surface: #ffffff;
+  --ink: #18224a;
+  --muted: #5b6582;
+  --line: #d7dce6;
+  --accent: #0b7f72;      /* "verified / works" */
+  --accent-soft: #e0f2ef;
+  --fresh: #c58f00;       /* "just added" marker */
+  --warn: #a15c07;
+  --danger: #b42318;
+  --focus: #3355ff;
+  --cjk: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --canvas: #0e1330;
+    --surface: #161d42;
+    --ink: #e7eaf4;
+    --muted: #9aa3c2;
+    --line: #2a3363;
+    --accent: #3cc2b0;
+    --accent-soft: #123a44;
+    --fresh: #f0c040;
+    --warn: #f0a050;
+    --danger: #ff7a6b;
+    --focus: #8aa2ff;
   }
 }
 
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-fresh: var(--fresh);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --font-display: "Space Grotesk Variable", var(--cjk);
+  --font-sans: "Instrument Sans Variable", var(--cjk);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  line-height: 1.55;
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* The one orchestrated moment: the "just added" ledger ticks in on load. */
+@keyframes ledger-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+.ledger-row {
+  animation: ledger-in 380ms ease-out both;
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "admin_users" ADD COLUMN "last_totp_step" integer DEFAULT 0 NOT NULL;

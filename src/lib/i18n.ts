@@ -1,0 +1,153 @@
+import { env } from "./env";
+
+export const locales = ["en", "zh"] as const;
+export type Locale = (typeof locales)[number];
+export const isLocale = (s: string): s is Locale => (locales as readonly string[]).includes(s);
+
+/** English lives at the root, Chinese under /zh (PRD §0). */
+export function href(locale: Locale, path: string) {
+  const p = path.startsWith("/") ? path : `/${path}`;
+  if (locale === "en") return p;
+  return p === "/" ? "/zh" : `/zh${p}`;
+}
+
+const zh = {
+  siteName: env.siteNameZh,
+  siteDescription: "每天自动更新的 AI 工具导航：按任务找工具，看清定价、国内能否访问和最近核验时间。",
+  nav: { categories: "分类", newToday: "今日新增", rank: "榜单", chinaAi: "中国 AI", methodology: "排序说明" },
+  langSwitch: "English",
+  heroTitle: "想用 AI 做什么？",
+  heroHint: "输入任务、工具名或拼音，比如“做 PPT”“抠图”“kimi”",
+  searchPlaceholder: "搜索 AI 工具",
+  searchButton: "搜索",
+  quickTasks: [["写文章", "writing", "writing-general"], ["做 PPT", "office", "office-slides"], ["生成视频", "video", "video-generation"], ["抠图", "image", "image-background"], ["配音", "audio", "audio-tts"], ["写代码", "coding", ""], ["翻译文档", "translation", "translation-docs"]] as [string, string, string][],
+  newToday: "新收录",
+  newTodayEmpty: "今天还没有新工具上架，下面是最近一周收录的。",
+  seeAll: "查看全部",
+  hotThisWeek: "本周热门",
+  allCategories: "全部分类",
+  tools: "个工具",
+  pricing: { free: "免费", freemium: "免费增值", paid: "付费", unknown: "定价未知" },
+  cnAccess: { direct: "国内可直接访问", unstable: "国内访问不稳定", blocked: "国内无法访问", unknown: "国内访问未知" },
+  cnAccessShort: { direct: "国内直连", unstable: "访问不稳", blocked: "需海外网络", unknown: "访问未知" },
+  platforms: { web: "网页", desktop: "桌面端", mobile: "移动端", plugin: "插件", api: "API" } as Record<string, string>,
+  filters: { pricing: "定价", access: "国内访问", platform: "平台", openSource: "开源", cnUi: "中文界面", any: "不限", clear: "清除筛选" },
+  sort: { label: "排序", rank: "综合", new: "最新", heat: "热度" },
+  all: "全部",
+  newBadge: "新",
+  visit: "访问官网",
+  features: "核心功能",
+  useCases: "适用场景",
+  pricingTitle: "定价",
+  facts: "基本信息",
+  company: "公司",
+  origin: "团队所在地",
+  platformsLabel: "平台",
+  listedAt: "收录于",
+  checkedAt: "最近核验",
+  notChecked: "待核验",
+  similar: "同类工具",
+  alternatives: "替代品",
+  rankIn: (cat: string, n: number) => `在「${cat}」中综合排名第 ${n}`,
+  tieTop: "与第 2 名难分高下",
+  maturity: "成熟度",
+  aiDisclaimer: "信息由 AI 辅助整理并经人工审核，具体以官网为准。",
+  offlineNotice: "该工具已停止服务，下面是可替代的工具。",
+  globalVersion: "海外版",
+  openSourceYes: "开源",
+  cnUiYes: "中文界面",
+  enterpriseYes: "有企业版",
+  searchResults: (q: string, n: number) => `“${q}”共 ${n} 个结果`,
+  searchEmpty: "没有找到相关工具。试试更短的关键词，或者从下面的分类里找：",
+  newTitle: "最新收录",
+  newIntro: "按上架日期倒序，所有工具都经过自动核验与人工审核。",
+  rankTitle: "本周榜单",
+  rankIntro: "按站内点击、外部热度和新鲜度综合计算，每天更新。",
+  chinaTitle: "中国 AI 工具",
+  chinaIntro: "由中国团队开发的 AI 工具，标注了海外版地址与访问情况。",
+  methodologyTitle: "我们如何排序",
+  notFound: "没有找到这个页面。",
+  backHome: "回到首页",
+  footerAbout: "AI 工具导航，每天自动发现、核验和更新。",
+  footerAd: "广告位均标注“广告”，不影响综合排序。",
+  ad: "广告",
+  blockedTitle: "已拦截此链接",
+  blockedBody: "安全检查提示该网站可能存在风险，我们暂时停止了跳转。",
+  dateFmt: (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`,
+};
+
+const en: typeof zh = {
+  siteName: env.siteNameEn,
+  siteDescription: "A daily-updated directory of AI tools — find a tool by task, with pricing, availability and the date we last checked it.",
+  nav: { categories: "Categories", newToday: "New", rank: "Trending", chinaAi: "China AI", methodology: "How we rank" },
+  langSwitch: "中文",
+  heroTitle: "What do you want to get done?",
+  heroHint: "Search by task or tool name — “make slides”, “remove background”, “Cursor”",
+  searchPlaceholder: "Search AI tools",
+  searchButton: "Search",
+  quickTasks: [["Write an article", "writing", "writing-general"], ["Make slides", "office", "office-slides"], ["Generate video", "video", "video-generation"], ["Remove a background", "image", "image-background"], ["Voiceover", "audio", "audio-tts"], ["Write code", "coding", ""], ["Translate a document", "translation", "translation-docs"]],
+  newToday: "Just added",
+  newTodayEmpty: "Nothing new today yet — here is what we added this week.",
+  seeAll: "See all",
+  hotThisWeek: "Trending this week",
+  allCategories: "All categories",
+  tools: "tools",
+  pricing: { free: "Free", freemium: "Freemium", paid: "Paid", unknown: "Pricing unknown" },
+  cnAccess: { direct: "Accessible in mainland China", unstable: "Unreliable in mainland China", blocked: "Not accessible in mainland China", unknown: "China access unknown" },
+  cnAccessShort: { direct: "Works in China", unstable: "Spotty in China", blocked: "Blocked in China", unknown: "China: unknown" },
+  platforms: { web: "Web", desktop: "Desktop", mobile: "Mobile", plugin: "Extension", api: "API" },
+  filters: { pricing: "Pricing", access: "China access", platform: "Platform", openSource: "Open source", cnUi: "Chinese UI", any: "Any", clear: "Clear filters" },
+  sort: { label: "Sort", rank: "Best match", new: "Newest", heat: "Popular" },
+  all: "All",
+  newBadge: "New",
+  visit: "Visit website",
+  features: "What it does",
+  useCases: "Good for",
+  pricingTitle: "Pricing",
+  facts: "Details",
+  company: "Company",
+  origin: "Team based in",
+  platformsLabel: "Platforms",
+  listedAt: "Listed",
+  checkedAt: "Last checked",
+  notChecked: "Not yet checked",
+  similar: "Similar tools",
+  alternatives: "Alternatives",
+  rankIn: (cat: string, n: number) => `#${n} in ${cat}`,
+  tieTop: "Too close to call with #2",
+  maturity: "Maturity",
+  aiDisclaimer: "Compiled with AI assistance and reviewed by an editor. Check the official site for the latest details.",
+  offlineNotice: "This tool has shut down. Here are alternatives.",
+  globalVersion: "Global version",
+  openSourceYes: "Open source",
+  cnUiYes: "Chinese UI",
+  enterpriseYes: "Enterprise plan",
+  searchResults: (q: string, n: number) => `${n} results for “${q}”`,
+  searchEmpty: "No tools matched. Try a shorter keyword, or browse a category:",
+  newTitle: "Newly added",
+  newIntro: "Newest first. Every tool is checked automatically and reviewed by an editor.",
+  rankTitle: "Trending this week",
+  rankIntro: "Ranked by clicks, external buzz and freshness. Updated daily.",
+  chinaTitle: "AI tools from China",
+  chinaIntro: "AI products built by teams in China, with links to their global versions.",
+  methodologyTitle: "How we rank tools",
+  notFound: "We couldn't find that page.",
+  backHome: "Back to home",
+  footerAbout: "An AI tool directory that finds, checks and updates tools every day.",
+  footerAd: "Sponsored placements are labelled and never affect rankings.",
+  ad: "Sponsored",
+  blockedTitle: "Link blocked",
+  blockedBody: "A safety check flagged this site, so we've paused the redirect.",
+  dateFmt: (d: Date) => d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }),
+};
+
+export const dict = { zh, en };
+export type Dict = typeof zh;
+export const t = (locale: Locale) => dict[locale];
+
+/** Pick the localized field from a row with *Zh / *En columns. */
+export function L<T extends Record<string, unknown>>(row: T, base: string, locale: Locale): string {
+  const zhV = row[`${base}Zh`] as string | undefined;
+  const enV = row[`${base}En`] as string | undefined;
+  return (locale === "zh" ? zhV || enV : enV || zhV) ?? "";
+}

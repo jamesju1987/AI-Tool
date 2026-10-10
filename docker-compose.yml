@@ -1,0 +1,95 @@
+# Production stack for one overseas VPS (2 vCPU / 4 GB is plenty to start).
+#   cp .env.example .env   # fill in DOMAIN, POSTGRES_PASSWORD, REVALIDATE_SECRET, keys…
+#   docker compose build && docker compose up -d db
+#   docker compose --profile tools run --rm migrate   # first deploy and after every upgrade
+#   docker compose run --rm -it web npx tsx src/scripts/create-admin.ts <username>
+#   docker compose up -d
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aitoolbox
+      POSTGRES_USER: aitoolbox
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aitoolbox -d aitoolbox"]
+      interval: 10s
+      retries: 5
+    # Not published: the database is only reachable from the other containers.
+
+  migrate:
+    build: .
+    command: ["sh", "-c", "npx tsx src/scripts/migrate.ts && npx tsx src/scripts/seed.ts"]
+    env_file: .env
+    environment: &dbenv
+      DATABASE_URL: postgres://aitoolbox:${POSTGRES_PASSWORD}@db:5432/aitoolbox
+    depends_on:
+      db: { condition: service_healthy }
+    profiles: ["tools"]
+
+  web:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      <<: *dbenv
+    volumes:
+      - media:/data/media
+    depends_on:
+      db: { condition: service_healthy }
+    # Only Caddy talks to the web container (needed for a trustworthy X-Forwarded-For).
+    expose: ["3000"]
+
+  worker:
+    build: .
+    restart: unless-stopped
+    command: ["npx", "tsx", "src/pipeline/worker.ts"]
+    env_file: .env
+    environment:
+      <<: *dbenv
+      INTERNAL_SITE_URL: http://web:3000
+    volumes:
+      - media:/data/media
+    depends_on:
+      db: { condition: service_healthy }
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ["80:80", "443:443", "443:443/udp"]
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [web]
+
+  # Nightly pg_dump, keeps 30 days (PRD §11). Copy ./backups off the server regularly.
+  backup:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./backups:/backups
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        while true; do
+          sleep $$(( (86400 + (19*3600) - $$(date +%s) % 86400) % 86400 + 1 ))   # ~03:00 Asia/Shanghai
+          f=/backups/aitoolbox-$$(date +%Y%m%d).sql.gz
+          pg_dump -h db -U aitoolbox aitoolbox | gzip > "$$f" && echo "backup $$f"
+          find /backups -name 'aitoolbox-*.sql.gz' -mtime +30 -delete
+        done
+    depends_on:
+      db: { condition: service_healthy }
+
+volumes:
+  pgdata:
+  media:
+  caddy_data:
+  caddy_config:
