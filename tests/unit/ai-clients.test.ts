@@ -16,10 +16,15 @@ vi.mock("@/pipeline/http", () => ({
   }),
 }));
 
-vi.mock("@/lib/env", async (orig) => {
-  const mod = await orig<typeof import("@/lib/env")>();
-  return { env: { ...mod.env, openrouterKey: "test-key", openrouterBase: "https://openrouter.ai/api", mockAi: false, jevModel: "typesafe/jev-1.13", jevSurface: "decisions" } };
-});
+// Mutable so each test can pick a provider.
+const fakeEnv = vi.hoisted(() => ({
+  typesafeKey: "", typesafeBase: "https://api.typesafe.ai",
+  openrouterKey: "test-key", openrouterBase: "https://openrouter.ai/api",
+  jevModel: "typesafe/jev-1.13", jevSurface: "decisions",
+  llmKey: "test-key", llmBase: "https://openrouter.ai/api/v1", llmModel: "m",
+  llmEnabled: true, jevEnabled: true, siteNameEn: "t", siteUrl: "http://t",
+}));
+vi.mock("@/lib/env", () => ({ env: fakeEnv }));
 
 beforeEach(() => {
   calls.length = 0;
@@ -43,6 +48,19 @@ describe("JevJudge", () => {
   });
 });
 
+describe("Jev provider selection", () => {
+  it("uses TypeSafe's /v1/systemone with the direct key when TYPESAFE_API_KEY is set", async () => {
+    const { JevJudge } = await import("@/pipeline/jev");
+    Object.assign(fakeEnv, { typesafeKey: "ts-key", jevModel: "jev-latest" });
+    reply = (body) => ({ answers: Object.fromEntries(Object.keys(body.questions as object).map((k) => [k, { choice: "B", confidence: 0.9 }])) });
+    const out = await new JevJudge().decide("s", { q: { instructions: "?", criteria: { A: "2", B: "3" } } });
+    expect(calls[0].url).toBe("https://api.typesafe.ai/v1/systemone");
+    expect(calls[0].body.model).toBe("jev-latest");
+    expect(out.q.B).toBeCloseTo(0.9, 5);
+    Object.assign(fakeEnv, { typesafeKey: "", jevModel: "typesafe/jev-1.13" });
+  });
+});
+
 describe("chatJson", () => {
   it("wraps scraped text as untrusted data and validates the JSON reply", async () => {
     const { chatJson } = await import("@/pipeline/llm");
@@ -54,5 +72,22 @@ describe("chatJson", () => {
     // The scraped text can't close the data block early.
     expect(user.match(/<\/untrusted_data>/g)).toHaveLength(1);
     expect(calls[0].body.response_format).toEqual({ type: "json_object" });
+  });
+});
+
+describe("getJudge", () => {
+  it("falls back to offline heuristics when Jev fails and no chat model is configured", async () => {
+    const { getJudge } = await import("@/pipeline/jev");
+    Object.assign(fakeEnv, { llmEnabled: false, jevEnabled: true });
+    reply = () => ({ error: { message: "bad key" } });
+    const http = await import("@/pipeline/http");
+    vi.mocked(http.apiFetch).mockResolvedValueOnce(new Response(JSON.stringify({ error: { message: "bad key" } }), { status: 401 }));
+    const warnings: string[] = [];
+    const judge = getJudge(() => 0.8, (m) => warnings.push(m));
+    const out = await judge.decide("s", { q: { instructions: "?", criteria: { yes: "y", no: "n" } } });
+    expect(out.q.yes).toBeCloseTo(0.8, 5);
+    expect(judge.name).toBe("mock");
+    expect(warnings[0]).toContain("HTTP 401");
+    Object.assign(fakeEnv, { llmEnabled: true });
   });
 });

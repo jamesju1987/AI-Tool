@@ -56,7 +56,7 @@ export async function login(username: string, password: string, code: string): P
   const token = randomBytes(32).toString("base64url");
   await db.insert(adminSessions).values({ id: hash(token), userId: user.id, ip, expiresAt: new Date(Date.now() + env.sessionHours * 3600_000) });
   await db.insert(loginAttempts).values(keys.map((key) => ({ key, ok: true })));
-  (await cookies()).set(COOKIE, token, { httpOnly: true, secure: env.isProd, sameSite: "strict", path: "/admin", maxAge: env.sessionHours * 3600 });
+  (await cookies()).set(COOKIE, token, { httpOnly: true, secure: env.cookieSecure, sameSite: "strict", path: "/admin", maxAge: env.sessionHours * 3600 });
   await audit("login", username);
   return { ok: true };
 }

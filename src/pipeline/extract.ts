@@ -57,7 +57,7 @@ export function categoryListForPrompt(cats: CategoryOption[]) {
 }
 
 export async function extractTool(site: SiteInfo, hint: { title?: string; text?: string }, cats: CategoryOption[]): Promise<Extracted> {
-  if (env.mockAi) return mockExtract(site, hint, cats);
+  if (!env.llmEnabled) return mockExtract(site, hint, cats);
   const data = [
     `URL: ${site.finalUrl}`,
     `TITLE: ${site.title}`,

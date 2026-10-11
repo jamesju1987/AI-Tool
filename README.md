@@ -41,7 +41,7 @@
 
 - **web**：页面在请求时读数据库，进程内缓存 2 分钟；worker 发布新内容后调用 `/api/revalidate` 立即清缓存。`next build` 不需要数据库。
 - **worker**：cron 只负责把任务放进队列（`job_runs` 表），一个循环按顺序执行，所以慢任务不会叠在一起；后台“立即运行”走同一个队列。
-- **AI**：没有配置 `OPENROUTER_API_KEY` 时自动进入离线模式，用规则代替模型，所有条目进入人工审核——本地开发和测试不需要任何密钥。
+- **AI**：Jev（排序与打分）和大模型（双语抽取）分别配置，缺哪个就用对应的降级方案；都没有时进入离线模式，所有条目进入人工审核——本地开发和测试不需要任何密钥。
 
 ### 每日节奏（`TZ_SCHEDULE`，默认 Asia/Shanghai）
 
@@ -62,9 +62,28 @@
 - **两两比较**（每周）：每个分类内按“有用（权重 2）/ 易上手 / 访问与付费方便”三个问题比较，每对正反两个顺序各问一次以抵消位置偏差，用 Bradley–Terry 合成排名；中英文站按各自受众分别排序；前两名差距过小时标注“难分高下”。
 - **综合分** = AI 评审 × w1 + 站内行为 × w2 + 外部信号 × w3 + 新鲜度 × w4，权重在后台“设置”中调整（冷启动 0.6/0.1/0.2/0.1）。
 - 每次判断都记录在 `jev_judgments` 表，便于复核与申诉。
-- Jev 通过 OpenRouter 调用（`typesafe/jev-1.13`，`/api/alpha/decisions`）。如果返回 404 “No allowed providers”，需要在 OpenRouter 隐私设置里允许 TypeSafe 提供方。Jev 不可用时自动退回到普通 LLM 评审。
+- Jev 有两种接入方式：Jev 官方 key（`TYPESAFE_API_KEY`，直连 `api.typesafe.ai/v1/systemone`，模型 `jev-latest`），或 OpenRouter（`OPENROUTER_API_KEY`，模型 `typesafe/jev-1.13`）；两者都配置时优先用官方 key。用 `npm run ai:check` 检查密钥。OpenRouter 返回 404 “No allowed providers” 时，需要在其隐私设置里允许 TypeSafe 提供方。Jev 不可用时自动退回到大模型评审；连大模型也没有时用离线规则，条目全部进人工审核。
+- 抽取用的大模型可以是任何 OpenAI 兼容接口：默认走 OpenRouter，也可以设 `LLM_BASE_URL` + `LLM_API_KEY` 直连 DeepSeek 等。
 
 ---
+
+## 在自己电脑上看效果（Docker Desktop）
+
+装好 [Docker Desktop](https://www.docker.com/products/docker-desktop/) 后，在项目目录运行：
+
+```bash
+docker compose -f docker-compose.local.yml up -d --build   # 首次约 5–10 分钟
+```
+
+然后打开 <http://localhost:3000/zh>（中文）或 <http://localhost:3000>（英文）。创建后台账号（用验证器 App 扫码），再打开 <http://localhost:3000/admin>：
+
+```bash
+docker compose -f docker-compose.local.yml exec web npx tsx src/scripts/create-admin.ts james
+```
+
+- 构建时默认使用 npmmirror 镜像下载依赖；不需要时设 `NPM_REGISTRY=https://registry.npmjs.org`。如果拉取 `node`、`postgres` 镜像很慢，请在 Docker Desktop → Settings → Docker Engine 里配置镜像加速。
+- 想试 Jev 和大模型：在项目目录建一个 `.env`，写入 `TYPESAFE_API_KEY=...`（或 `OPENROUTER_API_KEY=...`），然后 `docker compose -f docker-compose.local.yml up -d` 重启，再用 `docker compose -f docker-compose.local.yml exec web npm run ai:check` 检查密钥是否可用。注意：在中国大陆网络下这些海外接口可能连不上。
+- 停止：`docker compose -f docker-compose.local.yml down`（加 `-v` 会同时删除数据）。
 
 ## 本地开发
 

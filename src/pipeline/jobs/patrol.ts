@@ -64,7 +64,7 @@ export async function patrol(ctx: JobContext) {
       const pageChanged = prev && prev.pageHash !== site.pageHash;
       const pricingChanged = prev && site.pricingHash && prev.pricingHash && prev.pricingHash !== site.pricingHash;
       // Offline heuristics are too coarse to diff against an edited listing, so only with a real model.
-      if (!env.mockAi && (pageChanged || pricingChanged) && !(await hasPending(tool.id, "field_change"))) {
+      if (env.llmEnabled && (pageChanged || pricingChanged) && !(await hasPending(tool.id, "field_change"))) {
         const fresh = await extractTool(site, { title: tool.name }, options);
         const diff = diffWatched(tool, fresh);
         if (Object.keys(diff.after).length) {

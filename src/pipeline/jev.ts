@@ -42,9 +42,15 @@ export function parseAnswer(ans: { probabilities?: unknown; choice?: string; con
   return Object.fromEntries(options.map((o) => [o, o === ans.choice ? conf : rest]));
 }
 
+/** Where Jev requests go: TypeSafe directly (TYPESAFE_API_KEY) or via OpenRouter. */
+export function jevEndpoint() {
+  if (env.typesafeKey) return { provider: "typesafe" as const, url: `${env.typesafeBase}/v1/systemone`, key: env.typesafeKey };
+  const path = env.jevSurface === "systemone" ? "/v1/systemone" : "/alpha/decisions";
+  return { provider: "openrouter" as const, url: `${env.openrouterBase}${path}`, key: env.openrouterKey };
+}
+
 export class JevJudge implements Judge {
   name = `jev:${env.jevModel}`;
-  private path = env.jevSurface === "systemone" ? "/v1/systemone" : "/alpha/decisions";
 
   async decide(state: unknown, questions: Record<string, Question>): Promise<Answers> {
     const keys = Object.keys(questions);
@@ -61,9 +67,10 @@ export class JevJudge implements Judge {
     let delay = 1000;
     let last = "";
     for (let attempt = 0; attempt < 5; attempt++) {
-      const res = await apiFetch(`${env.openrouterBase}${this.path}`, {
+      const ep = jevEndpoint();
+      const res = await apiFetch(ep.url, {
         method: "POST",
-        headers: { authorization: `Bearer ${env.openrouterKey}`, "content-type": "application/json" },
+        headers: { authorization: `Bearer ${ep.key}`, "content-type": "application/json" },
         body: JSON.stringify(body),
       }, 120_000);
       if ([429, 500, 502, 503, 504].includes(res.status)) {
@@ -74,8 +81,9 @@ export class JevJudge implements Judge {
       }
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        // 404 "No allowed providers" = OpenRouter privacy settings block the TypeSafe provider.
-        throw new Error(`Jev HTTP ${res.status}: ${data?.error?.message ?? JSON.stringify(data).slice(0, 200)}`);
+        // 401/403 = bad key. On OpenRouter, 404 "No allowed providers" = privacy settings block TypeSafe.
+        const msg = data?.error?.message ?? data?.detail ?? JSON.stringify(data).slice(0, 200);
+        throw new Error(`Jev (${ep.provider}) HTTP ${res.status}: ${typeof msg === "string" ? msg : JSON.stringify(msg)}`);
       }
       jevUsage.requests++;
       jevUsage.questions += Object.keys((body as { questions: object }).questions).length;
@@ -144,7 +152,13 @@ export class FallbackJudge implements Judge {
   }
 }
 
+/**
+ * Jev when a Jev key is configured (falling back to the chat model, or to offline
+ * heuristics if there is no chat model either); otherwise the chat model; otherwise mock.
+ */
 export function getJudge(mockFn?: ConstructorParameters<typeof MockJudge>[0], warn?: (m: string) => void): Judge {
-  if (env.mockAi) return new MockJudge(mockFn);
-  return new FallbackJudge(new JevJudge(), new LlmJudge(), warn);
+  const offline = new MockJudge(mockFn);
+  if (env.jevEnabled) return new FallbackJudge(new JevJudge(), env.llmEnabled ? new LlmJudge() : offline, warn);
+  if (env.llmEnabled) return new LlmJudge();
+  return offline;
 }

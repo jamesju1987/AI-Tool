@@ -1,0 +1,67 @@
+# Run the whole site on your own computer (Docker Desktop):
+#   docker compose -f docker-compose.local.yml up -d --build
+#   open http://localhost:3000/zh
+# Create a back-office account (scan the QR code with an authenticator app):
+#   docker compose -f docker-compose.local.yml exec web npx tsx src/scripts/create-admin.ts <username>
+# Optional: put TYPESAFE_API_KEY / OPENROUTER_API_KEY etc. in a .env file next to this one.
+# Stop: docker compose -f docker-compose.local.yml down      (add -v to also delete the data)
+name: aitoolbox-local
+
+x-app: &app
+  build:
+    context: .
+    args:
+      NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+  image: aitoolbox-local
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    DATABASE_URL: postgres://aitoolbox:aitoolbox@db:5432/aitoolbox
+    SITE_URL: http://localhost:3000
+    INTERNAL_SITE_URL: http://web:3000
+    REVALIDATE_SECRET: local-dev-secret
+    COOKIE_SECURE: "false"
+    ADMIN_IP_ALLOWLIST: ""
+  volumes:
+    - media:/data/media
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: aitoolbox
+      POSTGRES_USER: aitoolbox
+      POSTGRES_PASSWORD: aitoolbox
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aitoolbox -d aitoolbox"]
+      interval: 3s
+      retries: 20
+
+  # Creates tables and loads categories + sample tools (safe to re-run).
+  setup:
+    <<: *app
+    command: ["sh", "-c", "npx tsx src/scripts/migrate.ts && npx tsx src/scripts/seed.ts"]
+    restart: "no"
+    depends_on:
+      db: { condition: service_healthy }
+
+  web:
+    <<: *app
+    ports: ["3000:3000"]
+    restart: unless-stopped
+    depends_on:
+      setup: { condition: service_completed_successfully }
+
+  worker:
+    <<: *app
+    command: ["npx", "tsx", "src/pipeline/worker.ts"]
+    restart: unless-stopped
+    depends_on:
+      setup: { condition: service_completed_successfully }
+
+volumes:
+  pgdata:
+  media:

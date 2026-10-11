@@ -2,8 +2,10 @@
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
+# Set NPM_REGISTRY=https://registry.npmmirror.com when building from mainland China.
+ARG NPM_REGISTRY=https://registry.npmjs.org
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --registry=$NPM_REGISTRY
 COPY . .
 # No database is needed at build time: every page reads Postgres at request time.
 RUN npx next build \

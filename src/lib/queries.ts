@@ -172,6 +172,18 @@ export function getToolPage(slug: string, locale: Locale) {
       const idx = peers.findIndex((p) => p.id === tool.id);
       rank = idx >= 0 && peers.length >= 3 ? idx + 1 : null;
       similar = peers.filter((p) => p.id !== tool.id).slice(0, 8).map(({ score: _s, ...p }) => toCard(p));
+      // A thin sub-category (e.g. "AI IDE" with 2 tools) borrows from its parent category.
+      if (similar.length < 5 && parent) {
+        const seen = new Set([tool.id, ...similar.map((s) => s.id)]);
+        const wider = await db
+          .select(cardColumns)
+          .from(tools)
+          .innerJoin(toolCategories, and(eq(toolCategories.toolId, tools.id), eq(toolCategories.categoryId, parent.id)))
+          .where(listed)
+          .orderBy(desc(rankCol(locale)), desc(tools.id))
+          .limit(20);
+        similar = [...similar, ...wider.filter((w) => !seen.has(w.id)).map(toCard)].slice(0, 8);
+      }
       const [r] = await db.select().from(categoryRankings).where(and(eq(categoryRankings.categoryId, primary.id), eq(categoryRankings.locale, locale)));
       tieAtTop = !!r?.tieAtTop && (rank === 1 || rank === 2);
     }

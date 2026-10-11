@@ -14,7 +14,8 @@
     "worker": "tsx src/pipeline/worker.ts",
     "job": "tsx src/scripts/run-job.ts",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "ai:check": "tsx src/scripts/check-ai.ts"
   },
   "dependencies": {
     "@fontsource-variable/instrument-sans": "^5.3.0",

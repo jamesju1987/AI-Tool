@@ -40,7 +40,9 @@ async function main() {
     cron.schedule(def.schedule, () => void enqueue(name).catch((e) => console.error(e)), { timezone: env.timezone });
     console.log(`scheduled ${name.padEnd(8)} ${def.schedule} (${env.timezone})`);
   }
-  console.log(`worker started — AI ${env.mockAi ? "MOCK (no OPENROUTER_API_KEY)" : `${env.llmModel} + ${env.jevModel}`}`);
+  const jev = env.jevEnabled ? `Jev ${env.jevModel} via ${env.jevProvider}` : "Jev off";
+  const llm = env.llmEnabled ? `LLM ${env.llmModel} @ ${new URL(env.llmBase).host}` : "LLM off (rule-based extraction)";
+  console.log(`worker started — ${jev}; ${llm}`);
   const shutdown = () => {
     stopping = true;
     console.log("stopping after current job…");

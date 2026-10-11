@@ -31,7 +31,11 @@ export default async function PanelLayout({ children }: { children: React.ReactN
             ))}
           </nav>
           <span className="ml-auto flex items-center gap-3 text-muted">
-            {env.mockAi && <span className="rounded bg-warn/15 px-2 py-0.5 text-warn">离线模式：未配置 OPENROUTER_API_KEY</span>}
+            {(!env.jevEnabled || !env.llmEnabled) && (
+              <span className="rounded bg-warn/15 px-2 py-0.5 text-warn">
+                {!env.jevEnabled && !env.llmEnabled ? "离线模式：未配置模型密钥" : !env.jevEnabled ? "未配置 Jev，评审改用大模型" : "未配置大模型，抽取用规则"}
+              </span>
+            )}
             <a href="/zh" target="_blank" className="hover:text-ink">查看网站</a>
             <span>{admin.username}</span>
             <form action={logoutAction}><button className="hover:text-ink">退出</button></form>
