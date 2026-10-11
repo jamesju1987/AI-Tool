@@ -30,7 +30,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
         </h1>
       )}
       {results.length > 0 ? (
-        <div className="mt-4 grid rounded-xl border border-line bg-surface p-2 sm:grid-cols-2">
+        <div className="mt-4 grid panel p-2 sm:grid-cols-2">
           {results.map((tool) => <ToolRow key={tool.id} tool={tool} locale={locale} />)}
         </div>
       ) : (
@@ -40,7 +40,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
             <ul className="mt-3 flex flex-wrap gap-2">
               {tree.map((c) => (
                 <li key={c.id}>
-                  <Link href={href(locale, `/category/${c.slug}`)} className="inline-block rounded-full bg-surface px-3 py-1 text-sm ring-1 ring-line hover:ring-ink">
+                  <Link href={href(locale, `/category/${c.slug}`)} className="inline-block rounded-full bg-white/[0.03] px-3 py-1 text-sm text-muted ring-1 ring-line hover:text-accent hover:ring-accent/40">
                     {L(c, "name", locale)}
                   </Link>
                 </li>

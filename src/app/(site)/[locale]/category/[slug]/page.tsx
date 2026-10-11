@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CategoryIcon } from "@/components/CategoryIcon";
 import { ToolRow } from "@/components/ui";
 import { getCategoryPage, type ToolFilters } from "@/lib/queries";
 import { href, L, t, type Locale } from "@/lib/i18n";
@@ -59,7 +60,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const hasFilters = ["pricing", "access", "platform", "os", "cnui"].some((k) => current[k]);
 
   const chip = (active: boolean) =>
-    `whitespace-nowrap rounded-full px-3 py-1 text-sm ${active ? "bg-ink text-canvas" : "bg-surface ring-1 ring-line hover:ring-ink"}`;
+    `whitespace-nowrap rounded-full px-3 py-1 text-sm transition ${active ? "bg-accent-soft text-accent ring-1 ring-accent/50" : "bg-white/[0.03] text-muted ring-1 ring-line hover:text-ink hover:ring-line-strong"}`;
 
   const groups: { key: string; label: string; options: [string, string][] }[] = [
     { key: "pricing", label: d.filters.pricing, options: Object.entries(d.pricing).filter(([k]) => k !== "unknown") },
@@ -69,15 +70,26 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
   return (
     <>
-      <nav aria-label="Breadcrumb" className="mb-3 text-sm text-muted">
+      <nav aria-label="Breadcrumb" className="mb-5 text-sm text-faint">
         <Link href={href(locale, "/")} className="hover:text-ink">{d.siteName}</Link>
         <span className="mx-2">/</span>
-        <span>{L(page.category, "name", locale)}</span>
+        {page.sub ? (
+          <Link href={base} className="hover:text-ink">{L(page.category, "name", locale)}</Link>
+        ) : (
+          <span className="text-muted">{L(page.category, "name", locale)}</span>
+        )}
       </nav>
-      <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        {L(page.sub ?? page.category, "name", locale)}
-      </h1>
-      {page.category.descriptionZh && <p className="mt-2 text-muted">{L(page.category, "description", locale)}</p>}
+      <div className="flex items-center gap-4">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent ring-1 ring-accent/25 shadow-[0_0_30px_-6px_rgb(56_225_208/0.5)]">
+          <CategoryIcon slug={page.category.slug} className="h-6 w-6" />
+        </span>
+        <div>
+          <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] sm:text-[2.4rem]">
+            {L(page.sub ?? page.category, "name", locale)}
+          </h1>
+          {page.category.descriptionZh && <p className="mt-1 text-muted">{L(page.category, "description", locale)}</p>}
+        </div>
+      </div>
 
       {page.category.children.length > 0 && (
         <div role="tablist" className="mt-6 flex gap-2 overflow-x-auto pb-1">
@@ -94,7 +106,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         <aside aria-label={locale === "zh" ? "筛选" : "Filters"} className="space-y-5 text-sm">
           {groups.map((g) => (
             <fieldset key={g.key}>
-              <legend className="mb-2 font-medium">{g.label}</legend>
+              <legend className="mb-2.5 text-xs text-faint">{g.label}</legend>
               <div className="flex flex-wrap gap-1.5">
                 <Link href={link({ [g.key]: undefined })} className={chip(!current[g.key])}>{d.filters.any}</Link>
                 {g.options.map(([v, label]) => (
@@ -118,9 +130,9 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
         <section>
           <div className="mb-2 flex items-center justify-between gap-4 text-sm">
-            <span className="text-muted tabular-nums">{page.tools.length} {d.tools}</span>
+            <span className="font-mono text-xs text-faint tabular-nums">{page.tools.length} {d.tools}</span>
             <span className="flex items-center gap-1">
-              <span className="mr-1 text-muted">{d.sort.label}</span>
+              <span className="mr-1 text-xs text-faint">{d.sort.label}</span>
               {(["rank", "new", "heat"] as const).map((s) => (
                 <Link key={s} href={link({ sort: s === "rank" ? undefined : s })} className={chip((f.sort ?? "rank") === s)}>
                   {d.sort[s]}
@@ -128,7 +140,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               ))}
             </span>
           </div>
-          <div className="grid rounded-xl border border-line bg-surface p-2 sm:grid-cols-2">
+          <div className="grid panel p-2 sm:grid-cols-2">
             {page.tools.map((tool, i) => (
               <ToolRow key={tool.id} tool={tool} locale={locale} rank={f.sort === "rank" && !hasFilters ? i + 1 : undefined} />
             ))}

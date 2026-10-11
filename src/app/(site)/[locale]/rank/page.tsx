@@ -24,7 +24,7 @@ export default async function RankPage({ params }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemList).replace(/</g, "\\u003c") }} />
       <PageTitle title={d.rankTitle} intro={d.rankIntro} />
-      <ol className="grid rounded-xl border border-line bg-surface p-2 sm:grid-cols-2">
+      <ol className="grid panel p-2 sm:grid-cols-2">
         {rows.map((tool, i) => (
           <li key={tool.id}><ToolRow tool={tool} locale={locale} rank={i + 1} /></li>
         ))}

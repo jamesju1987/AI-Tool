@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowUpRight, Check } from "lucide-react";
 import { notFound, permanentRedirect } from "next/navigation";
 import { TrackView } from "@/components/TrackView";
 import { AccessDot, fmtDate, PriceTag, ToolLogo, ToolRow } from "@/components/ui";
@@ -70,7 +71,7 @@ export default async function ToolPage({ params }: Props) {
       <TrackView slug={tool.slug} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
 
-      <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted">
+      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-faint">
         <Link href={href(locale, "/")} className="hover:text-ink">{d.siteName}</Link>
         {parent && (
           <>
@@ -91,99 +92,127 @@ export default async function ToolPage({ params }: Props) {
         )}
       </nav>
 
-      {offline && <p className="mb-6 rounded-lg border border-danger/40 bg-surface p-3 text-sm text-danger">{d.offlineNotice}</p>}
+      {offline && <p className="mb-6 rounded-xl bg-danger/10 p-3 text-sm text-danger ring-1 ring-danger/30">{d.offlineNotice}</p>}
 
-      <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
-        <div className="min-w-0">
-          <header className="flex items-start gap-4">
-            <ToolLogo name={tool.name} src={tool.logoUrl} size={64} />
-            <div className="min-w-0">
-              <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">{tool.name}</h1>
-              <p className="mt-1 text-lg text-muted">{L(tool, "tagline", locale)}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <PriceTag pricing={tool.pricingType} locale={locale} />
-                <AccessDot access={tool.cnAccess} locale={locale} />
-                {tool.openSource && <span className="text-xs text-muted">{d.openSourceYes}</span>}
-                {tool.hasCnUi && <span className="text-xs text-muted">{d.cnUiYes}</span>}
-                {tool.hasEnterprise && <span className="text-xs text-muted">{d.enterpriseYes}</span>}
-              </div>
+      {/* Hero card: identity, verdict chips and the one primary action. */}
+      <header className="panel relative overflow-hidden p-6 sm:p-8">
+        <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgb(139_124_255/0.25),transparent_65%)]" />
+        <div aria-hidden className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgb(56_225_208/0.14),transparent_65%)]" />
+        <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center">
+          <div className="rounded-2xl shadow-[0_0_40px_-6px_rgb(56_225_208/0.45)]">
+            <ToolLogo name={tool.name} src={tool.logoUrl} size={72} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] sm:text-[2.6rem] sm:leading-tight">{tool.name}</h1>
+            <p className="mt-1.5 text-lg text-muted">{L(tool, "tagline", locale)}</p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <PriceTag pricing={tool.pricingType} locale={locale} />
+              <AccessDot access={tool.cnAccess} locale={locale} />
+              {[tool.openSource && d.openSourceYes, tool.hasCnUi && d.cnUiYes, tool.hasEnterprise && d.enterpriseYes]
+                .filter(Boolean)
+                .map((x) => (
+                  <span key={String(x)} className="rounded-md px-1.5 py-0.5 text-[11px] text-muted ring-1 ring-line">{x}</span>
+                ))}
             </div>
-          </header>
-
-          {rank && primary && (
-            <p className="mt-5 text-sm">
-              <Link href={href(locale, `/category/${parent?.slug ?? primary.slug}`) + (parent ? `?sub=${primary.slug}` : "")} className="font-medium underline-offset-2 hover:underline">
-                {d.rankIn(catName, rank)}
-              </Link>
-              {tieAtTop && <span className="ml-2 text-muted">({d.tieTop})</span>}
-            </p>
-          )}
-
+          </div>
           {!offline && (
-            <div className="mt-6 flex flex-wrap gap-3">
-              <a href={`/go/${tool.slug}`} rel="nofollow noopener" target="_blank" className="inline-flex h-11 items-center rounded-lg bg-ink px-5 font-medium text-canvas hover:opacity-90">
+            <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+              <a
+                href={`/go/${tool.slug}`}
+                rel="nofollow noopener"
+                target="_blank"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-accent px-6 font-medium text-[#04201c] shadow-[0_0_30px_-6px_rgb(56_225_208/0.7)] transition hover:brightness-110"
+              >
                 {d.visit}
+                <ArrowUpRight aria-hidden className="h-4 w-4" />
               </a>
               {tool.globalUrl && (
-                <a href={`/go/${tool.slug}?v=global`} rel="nofollow noopener" target="_blank" className="inline-flex h-11 items-center rounded-lg px-5 font-medium ring-1 ring-line hover:ring-ink">
+                <a href={`/go/${tool.slug}?v=global`} rel="nofollow noopener" target="_blank" className="text-center text-sm text-muted hover:text-accent">
                   {d.globalVersion}
                 </a>
               )}
             </div>
           )}
+        </div>
 
+        {rank && primary && (
+          <div className="relative mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-line pt-5 text-sm">
+            <Link
+              href={href(locale, `/category/${parent?.slug ?? primary.slug}`) + (parent ? `?sub=${primary.slug}` : "")}
+              className="inline-flex items-center gap-2 text-ink hover:text-accent"
+            >
+              <span className="font-mono text-accent">#{rank}</span>
+              {d.rankLabel(catName)}
+            </Link>
+            {tieAtTop && <span className="text-muted">{d.tieTop}</span>}
+          </div>
+        )}
+      </header>
+
+      <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_320px]">
+        <div className="min-w-0">
           {tool.imageUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={tool.imageUrl} alt="" loading="lazy" className="mt-8 w-full rounded-xl border border-line bg-surface" />
+            <img src={tool.imageUrl} alt="" loading="lazy" className="mb-8 w-full rounded-2xl ring-1 ring-line bg-surface" />
           )}
 
-          {L(tool, "description", locale) && <p className="mt-8 max-w-[68ch] text-[1.05rem]">{L(tool, "description", locale)}</p>}
+          {L(tool, "description", locale) && <p className="max-w-[68ch] text-[1.08rem] leading-relaxed text-ink/90">{L(tool, "description", locale)}</p>}
 
           {features.length > 0 && (
-            <section className="mt-8">
-              <h2 className="font-display text-xl font-semibold">{d.features}</h2>
-              <ul className="mt-3 max-w-[68ch] list-disc space-y-1.5 pl-5">
-                {features.map((f) => <li key={f}>{f}</li>)}
+            <section className="mt-10">
+              <h2 className="font-display text-lg font-semibold">{d.features}</h2>
+              <ul className="mt-4 grid max-w-[68ch] gap-2 sm:grid-cols-2">
+                {features.map((f) => (
+                  <li key={f} className="flex gap-2.5 rounded-xl bg-white/[0.02] px-3.5 py-2.5 text-sm ring-1 ring-line">
+                    <Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                    {f}
+                  </li>
+                ))}
               </ul>
             </section>
           )}
           {useCases.length > 0 && (
-            <section className="mt-8">
-              <h2 className="font-display text-xl font-semibold">{d.useCases}</h2>
-              <ul className="mt-3 max-w-[68ch] list-disc space-y-1.5 pl-5">
-                {useCases.map((f) => <li key={f}>{f}</li>)}
+            <section className="mt-10">
+              <h2 className="font-display text-lg font-semibold">{d.useCases}</h2>
+              <ul className="mt-4 grid max-w-[68ch] gap-2 sm:grid-cols-2">
+                {useCases.map((f) => (
+                  <li key={f} className="flex gap-2.5 rounded-xl bg-white/[0.02] px-3.5 py-2.5 text-sm ring-1 ring-line">
+                    <Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                    {f}
+                  </li>
+                ))}
               </ul>
             </section>
           )}
-          <section className="mt-8">
-            <h2 className="font-display text-xl font-semibold">{d.pricingTitle}</h2>
+          <section className="mt-10">
+            <h2 className="font-display text-lg font-semibold">{d.pricingTitle}</h2>
             <p className="mt-2 font-medium">{d.pricing[tool.pricingType]}</p>
             {pricingNote && <p className="mt-1 max-w-[68ch] text-muted">{pricingNote}</p>}
           </section>
 
-          <p className="mt-10 text-xs text-muted">{d.aiDisclaimer}</p>
+          <p className="mt-12 text-xs text-faint">{d.aiDisclaimer}</p>
         </div>
 
         <aside className="space-y-6">
-          <section className="rounded-xl border border-line bg-surface p-4 text-sm">
-            <h2 className="mb-3 font-display font-semibold">{d.facts}</h2>
-            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
+          <section className="panel p-5 text-sm">
+            <h2 className="mb-4 font-display font-semibold">{d.facts}</h2>
+            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2.5 [&_dt]:text-faint">
               {tool.company && (<><dt className="text-muted">{d.company}</dt><dd>{tool.company}</dd></>)}
               {region && (<><dt className="text-muted">{d.origin}</dt><dd>{region}</dd></>)}
               {tool.platforms.length > 0 && (<><dt className="text-muted">{d.platformsLabel}</dt><dd>{tool.platforms.map((p) => d.platforms[p] ?? p).join(" / ")}</dd></>)}
               <dt className="text-muted">{d.filters.access}</dt><dd>{d.cnAccess[tool.cnAccess]}</dd>
-              {tool.maturity != null && (<><dt className="text-muted">{d.maturity}</dt><dd aria-label={`${Math.round(tool.maturity)}/5`}>{"●".repeat(Math.round(tool.maturity))}<span className="text-line">{"●".repeat(5 - Math.round(tool.maturity))}</span></dd></>)}
-              <dt className="text-muted">{d.listedAt}</dt><dd>{fmtDate(tool.listedAt, locale)}</dd>
-              <dt className="text-muted">{d.checkedAt}</dt><dd>{tool.lastCheckedAt ? fmtDate(tool.lastCheckedAt, locale) : d.notChecked}</dd>
+              {tool.maturity != null && (<><dt className="text-muted">{d.maturity}</dt><dd aria-label={`${Math.round(tool.maturity)}/5`} className="flex items-center gap-1 pt-1.5">{[1, 2, 3, 4, 5].map((i) => <span key={i} className={`h-1.5 w-5 rounded-full ${i <= Math.round(tool.maturity!) ? "heat-fill" : "bg-white/10"}`} />)}</dd></>)}
+              <dt className="text-muted">{d.listedAt}</dt><dd className="font-mono text-xs leading-6">{fmtDate(tool.listedAt, locale)}</dd>
+              <dt className="text-muted">{d.checkedAt}</dt><dd className="font-mono text-xs leading-6">{tool.lastCheckedAt ? fmtDate(tool.lastCheckedAt, locale) : d.notChecked}</dd>
             </dl>
           </section>
           {similar.length > 0 && (
             <section>
               <div className="mb-1 flex items-baseline justify-between">
                 <h2 className="font-display font-semibold">{d.similar}</h2>
-                <Link href={href(locale, `/tool/${tool.slug}/alternatives`)} className="text-sm text-muted hover:text-ink">{d.seeAll}</Link>
+                <Link href={href(locale, `/tool/${tool.slug}/alternatives`)} className="text-sm text-muted hover:text-accent">{d.seeAll}</Link>
               </div>
-              <div className="-mx-2">
+              <div className="panel p-1.5">
                 {similar.slice(0, 5).map((s) => <ToolRow key={s.id} tool={s} locale={locale} />)}
               </div>
             </section>

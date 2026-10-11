@@ -7,7 +7,7 @@ import type { Locale } from "./i18n";
 /** What a list/card needs — keeps cache entries small and serialisable. */
 export type ToolCard = Pick<
   Tool,
-  "id" | "slug" | "name" | "logoUrl" | "taglineZh" | "taglineEn" | "pricingType" | "cnAccess" | "openSource" | "hasCnUi" | "originCountry"
+  "id" | "slug" | "name" | "logoUrl" | "taglineZh" | "taglineEn" | "pricingType" | "cnAccess" | "openSource" | "hasCnUi" | "originCountry" | "heatScore"
 > & { listedAt: string | null };
 
 const cardColumns = {
@@ -22,6 +22,7 @@ const cardColumns = {
   openSource: tools.openSource,
   hasCnUi: tools.hasCnUi,
   originCountry: tools.originCountry,
+  heatScore: tools.heatScore,
   listedAt: tools.listedAt,
 };
 
@@ -80,7 +81,33 @@ export function getHomeData(locale: Locale) {
     const perCategory: Record<number, ToolCard[]> = {};
     for (const r of ranked) (perCategory[r.category_id] ??= []).push(byId.get(r.id)!);
 
-    return { fresh: fresh.map(toCard), freshIsToday, hot: hot.map(toCard), perCategory };
+    // Radar: every listed tool, placed in its top-level category's sector.
+    const radarRows = await db.execute<{ id: number; slug: string; name: string; heat: number; listed_at: Date | null; top: number }>(dsql`
+      select t.id, t.slug, t.name, t.heat_score as heat, t.listed_at,
+             coalesce(c.parent_id, c.id) as top
+      from tools t
+      join tool_categories tc on tc.tool_id = t.id and tc.is_primary
+      join categories c on c.id = tc.category_id
+      where t.status = 'listed'`);
+    const radar = radarRows.map((r) => ({ id: r.id, slug: r.slug, name: r.name, heat: Number(r.heat), top: Number(r.top), listedAt: r.listed_at ? new Date(r.listed_at).toISOString() : null }));
+    const [stats] = await db
+      .select({
+        listed: dsql<number>`count(*) filter (where ${tools.status} = 'listed')::int`,
+        week: dsql<number>`count(*) filter (where ${tools.status} = 'listed' and ${tools.listedAt} >= ${weekAgo.toISOString()})::int`,
+        lastListed: dsql<string | null>`max(${tools.listedAt}) filter (where ${tools.status} = 'listed')`,
+        lastChecked: dsql<string | null>`max(${tools.lastCheckedAt})`,
+      })
+      .from(tools);
+    const toIso = (v: unknown) => (v ? new Date(v as string).toISOString() : null);
+
+    return {
+      fresh: fresh.map(toCard),
+      freshIsToday,
+      hot: hot.map(toCard),
+      perCategory,
+      radar,
+      stats: { listed: stats.listed, week: stats.week, categories: tree.length, lastListed: toIso(stats.lastListed), lastChecked: toIso(stats.lastChecked) },
+    };
   });
 }
 

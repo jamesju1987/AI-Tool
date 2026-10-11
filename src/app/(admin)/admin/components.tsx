@@ -53,7 +53,7 @@ export function ActionForm({
 
 export function SubmitButton({ children, variant = "primary", name, value, form }: { children: React.ReactNode; variant?: "primary" | "secondary" | "danger"; name?: string; value?: string; form?: string }) {
   const cls = {
-    primary: "bg-ink text-canvas hover:opacity-90",
+    primary: "bg-accent text-[#04201c] hover:brightness-110",
     secondary: "ring-1 ring-line hover:ring-ink",
     danger: "text-danger ring-1 ring-danger/50 hover:bg-danger hover:text-white",
   }[variant];

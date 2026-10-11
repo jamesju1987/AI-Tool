@@ -32,7 +32,7 @@ export default async function NewPage({ params, searchParams }: Props) {
         {[...groups.entries()].map(([day, list]) => (
           <section key={day} aria-label={day}>
             <h2 className="mb-2 font-display text-lg font-semibold tabular-nums">{day}</h2>
-            <div className="grid rounded-xl border border-line bg-surface p-2 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid panel p-2 sm:grid-cols-2 lg:grid-cols-3">
               {list.map((tool) => <ToolRow key={tool.id} tool={tool} locale={locale} />)}
             </div>
           </section>

@@ -47,7 +47,7 @@ export default async function AlternativesPage({ params }: Props) {
           : `${similar.length} tools in the same category as ${tool.name}, ranked, with pricing, China access and Chinese-language support side by side.`}
       </p>
 
-      <div className="mt-8 overflow-x-auto rounded-xl border border-line bg-surface">
+      <div className="panel mt-8 overflow-x-auto">
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="border-b border-line text-muted">
             <tr>
@@ -59,7 +59,7 @@ export default async function AlternativesPage({ params }: Props) {
           </thead>
           <tbody>
             {rows.map((r, i) => (
-              <tr key={r.id} className={`border-b border-line last:border-0 ${i === 0 ? "bg-canvas/60" : ""}`}>
+              <tr key={r.id} className={`border-b border-line last:border-0 ${i === 0 ? "bg-accent-soft/40" : ""}`}>
                 <td className="px-4 py-3">
                   <Link href={href(locale, `/tool/${r.slug}`)} className="flex items-center gap-3 hover:underline">
                     <ToolLogo name={r.name} src={r.logoUrl} size={28} />

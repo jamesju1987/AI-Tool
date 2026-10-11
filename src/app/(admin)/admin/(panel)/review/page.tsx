@@ -52,7 +52,7 @@ export default async function ReviewPage({ searchParams }: { searchParams: Promi
       <aside className="space-y-1 text-sm lg:max-h-[80vh] lg:overflow-y-auto">
         <p className="mb-2 text-muted">待审 {queue.length} 条</p>
         {queue.map((q) => (
-          <Link key={q.id} href={`/admin/review?id=${q.id}`} className={`block rounded-md px-2 py-1.5 ${q.id === currentId ? "bg-ink text-canvas" : "hover:bg-surface"}`}>
+          <Link key={q.id} href={`/admin/review?id=${q.id}`} className={`block rounded-md px-2 py-1.5 ${q.id === currentId ? "bg-accent-soft text-accent ring-1 ring-accent/40" : "hover:bg-surface"}`}>
             <span className="block truncate">{q.name ?? `#${q.id}`}</span>
             <span className="text-xs opacity-70">{TYPE_LABEL[q.type]}{q.confidence != null ? ` · ${q.confidence.toFixed(2)}` : ""}</span>
           </Link>

@@ -18,7 +18,7 @@ export default async function ChinaAiPage({ params }: Props) {
   return (
     <>
       <PageTitle title={d.chinaTitle} intro={d.chinaIntro} />
-      <div className="grid rounded-xl border border-line bg-surface p-2 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid panel p-2 sm:grid-cols-2 lg:grid-cols-3">
         {rows.map((tool) => (
           <div key={tool.id}>
             <ToolRow tool={tool} locale={locale} />
